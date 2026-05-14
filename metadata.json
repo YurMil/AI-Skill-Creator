@@ -1,0 +1,6 @@
+{
+  "name": "Agent Skill Crafter",
+  "description": "A visual canvas to explore, configure, combine, and download LLM Agent skills as ready-to-use zip archives.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
