@@ -2,13 +2,17 @@
 
 A visual editor for building AI agent skill packs. The app lets you choose reusable skills from a library, arrange and configure them on a canvas, then download the result as a ready-to-use zip archive.
 
+## Agent Notes
+
+Before making changes, read [docs/agent.md](docs/agent.md). It summarizes the Cloudflare Pages deployment constraints, application structure, data flow, and key files for coding agents.
+
 ## Features
 
 - Built-in library of base agent skills.
 - React Flow canvas for composing skills visually.
 - Configuration panel for selected skill nodes.
 - Skill pack sidebar with zip export.
-- Local Express API that serves demo skill data.
+- Static skill data loaded from `public/data/skills.json` for Cloudflare Pages compatibility.
 
 ## Tech Stack
 
@@ -85,6 +89,9 @@ src/
   main.tsx           React entrypoint
   store.ts           Zustand store
   types.ts           Shared TypeScript types
+public/data/skills.json
+                     Static skill library used by Cloudflare Pages
+docs/agent.md        Notes for coding agents
 server.ts            Express API and Vite middleware
 vite.config.ts       Vite configuration
 ```
