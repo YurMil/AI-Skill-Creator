@@ -71,6 +71,24 @@ npm run lint
 
 Runs TypeScript validation without emitting files.
 
+```bash
+npm test
+```
+
+Runs validation smoke tests.
+
+## Contribution Workflow
+
+Use short-lived branches and pull requests into `main`. Before pushing a branch, run:
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+GitHub Actions runs the same checks for pull requests and pushes to `main`. See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming, commit style, PR expectations, and recommended branch protection settings.
+
 ## Environment Variables
 
 The project does not require AI provider keys or backend secrets.

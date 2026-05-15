@@ -1,0 +1,24 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Europe/Tallinn
+    open-pull-requests-limit: 5
+    groups:
+      vite-tooling:
+        patterns:
+          - vite
+          - "@vitejs/*"
+          - typescript
+          - tsx
+          - esbuild
+      react-ui:
+        patterns:
+          - react
+          - react-dom
+          - "@xyflow/*"
+          - lucide-react
