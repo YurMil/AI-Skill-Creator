@@ -1,0 +1,84 @@
+{
+  "articles": [
+    {
+      "id": "skill-structure",
+      "title": "Skill package structure",
+      "summary": "Canonical folders and files accepted by the local builder.",
+      "category": "Authoring",
+      "relatedErrorCodes": ["INVALID_METADATA_JSON", "UNSUPPORTED_FILE_TYPE"],
+      "body": "# Skill package structure\n\nA v1 package has one top-level folder when exported. Inside the builder, paths are stored relative to that folder.\n\nExpected files include `SKILL.md`, optional `README.md`, optional `LICENSE`, optional `metadata.json`, and optional folders `references/`, `scripts/`, `assets/`, `examples/`, and `evals/`."
+    },
+    {
+      "id": "skill-frontmatter",
+      "title": "SKILL.md frontmatter",
+      "summary": "Required YAML fields for a valid skill entrypoint.",
+      "category": "Authoring",
+      "relatedErrorCodes": ["INVALID_YAML_FRONTMATTER", "MISSING_NAME", "MISSING_DESCRIPTION"],
+      "body": "# SKILL.md frontmatter\n\nEvery skill needs YAML frontmatter at the top of `SKILL.md`.\n\n```\n---\nname: csv-analysis-reporter\ndescription: Analyze CSV files and generate markdown reports. Use when the user needs metrics, trends, or anomalies from tabular data.\n---\n```\n\nUse simple `key: value` lines in v1."
+    },
+    {
+      "id": "naming-rules",
+      "title": "Naming rules",
+      "summary": "How to choose a compatible skill name.",
+      "category": "Authoring",
+      "relatedErrorCodes": ["INVALID_SKILL_NAME"],
+      "body": "# Naming rules\n\nUse lowercase hyphen-separated words. Avoid spaces, underscores, uppercase letters, and generic names.\n\nGood: `csv-analysis-reporter`\n\nBad: `CSV Analyzer`, `csv_analyzer`, `skill-helper`."
+    },
+    {
+      "id": "description-writing",
+      "title": "Description writing",
+      "summary": "Write descriptions that help agents decide when to activate a skill.",
+      "category": "Authoring",
+      "relatedErrorCodes": ["DESCRIPTION_TOO_VAGUE"],
+      "body": "# Description writing\n\nA description should say what the skill does and when to use it. Include concrete task contexts.\n\nGood: `Analyze CSV files and generate structured markdown reports. Use when the agent needs to summarize tabular metrics, trends, and anomalies.`\n\nAvoid vague descriptions like `helps with tasks`."
+    },
+    {
+      "id": "references-scripts-assets",
+      "title": "References, scripts, and assets",
+      "summary": "When to put content in supporting folders.",
+      "category": "Authoring",
+      "relatedErrorCodes": ["BROKEN_LOCAL_REFERENCE"],
+      "body": "# References, scripts, and assets\n\nUse `references/` for detailed domain rules, `scripts/` for deterministic helper code, and `assets/` for templates or media. If `SKILL.md` mentions `references/schema.md`, the file should exist in the package."
+    },
+    {
+      "id": "validation-errors",
+      "title": "Validation errors",
+      "summary": "How to read local validation reports.",
+      "category": "Validation",
+      "relatedErrorCodes": ["MISSING_SKILL_MD", "MULTIPLE_SKILL_MD"],
+      "body": "# Validation errors\n\nErrors block local approval and verified export. Warnings allow export but require review. Info messages are improvement hints.\n\nThe most important rule is exactly one root-level `SKILL.md`."
+    },
+    {
+      "id": "safe-scripts",
+      "title": "Safe script handling",
+      "summary": "How v1 treats package scripts and suspicious content.",
+      "category": "Security",
+      "relatedErrorCodes": ["UNSUPPORTED_FILE_TYPE", "SUSPECTED_SECRET", "SCRIPT_REQUIRES_REVIEW", "SUSPICIOUS_INSTRUCTION"],
+      "body": "# Safe script handling\n\nAI Skill Hub v1 never executes imported scripts. Scripts and hidden files are flagged for manual review. Remove secrets, private keys, destructive commands, and policy-bypass instructions before sharing a package."
+    },
+    {
+      "id": "zip-import-troubleshooting",
+      "title": "ZIP import troubleshooting",
+      "summary": "Common reasons a ZIP import is rejected.",
+      "category": "Import",
+      "relatedErrorCodes": ["PATH_TRAVERSAL_DETECTED", "MULTIPLE_TOP_LEVEL_FOLDERS", "ARCHIVE_TOO_LARGE", "TOO_MANY_FILES"],
+      "body": "# ZIP import troubleshooting\n\nA valid archive contains one top-level folder and no absolute paths, parent-directory paths, duplicate normalized paths, nested archive surprises, or excessive file counts."
+    },
+    {
+      "id": "export-agent-clients",
+      "title": "Export for agent clients",
+      "summary": "How exported ZIP files are shaped.",
+      "category": "Export",
+      "relatedErrorCodes": [],
+      "body": "# Export for agent clients\n\nExport creates `<skill-name>-draft.zip` or `<skill-name>-<version>.zip`. Inside the archive is one top-level folder containing `SKILL.md` and supporting files."
+    },
+    {
+      "id": "workspace-backup",
+      "title": "Local workspace backup",
+      "summary": "Move local drafts between browsers or machines.",
+      "category": "Workspace",
+      "relatedErrorCodes": [],
+      "body": "# Local workspace backup\n\nWorkspace data is stored in IndexedDB in the current browser. Use Workspace -> Export backup to save a JSON backup, and Import backup to restore it elsewhere."
+    }
+  ]
+}

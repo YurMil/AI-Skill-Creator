@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.prose-preview h1 {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.prose-preview h2 {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.prose-preview h3 {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 0.925rem;
+  font-weight: 700;
+}
+
+.prose-preview code {
+  border-radius: 0.25rem;
+  background: #e2e8f0;
+  padding: 0.05rem 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.85em;
+}

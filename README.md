@@ -1,6 +1,6 @@
-# Agent Skill Crafter
+# AI Skill Hub
 
-A visual editor for building AI agent skill packs. The app lets you choose reusable skills from a library, arrange and configure them on a canvas, then download the result as a ready-to-use zip archive.
+A local-first web app for discovering, creating, importing, validating, reviewing, and exporting AI agent skill packages. The production target is a static Vite build on Cloudflare Pages.
 
 ## Agent Notes
 
@@ -8,11 +8,13 @@ Before making changes, read [docs/agent.md](docs/agent.md). It summarizes the Cl
 
 ## Features
 
-- Built-in library of base agent skills.
-- React Flow canvas for composing skills visually.
-- Configuration panel for selected skill nodes.
-- Skill pack sidebar with zip export.
-- Static skill data loaded from `public/data/skills.json` for Cloudflare Pages compatibility.
+- Static catalog loaded from `public/data/catalog.json`.
+- Browser-only skill package editor with file tree, markdown editing, preview, validation, and ZIP export.
+- ZIP import with local path normalization and validation.
+- IndexedDB workspace for local drafts, statuses, and backup import/export.
+- Local review statuses for draft, validated, submitted, approved, rejected, and blocked packages.
+- Knowledge base loaded from `public/data/kb/articles.json`.
+- React Flow composer mode for visual skill pack composition.
 
 ## Tech Stack
 
@@ -34,7 +36,6 @@ Before making changes, read [docs/agent.md](docs/agent.md). It summarizes the Cl
 
 ```bash
 npm install
-cp .env.example .env.local
 npm run dev
 ```
 
@@ -50,19 +51,19 @@ http://localhost:3000
 npm run dev
 ```
 
-Starts the local Express + Vite development server.
+Starts the Vite development server.
 
 ```bash
 npm run build
 ```
 
-Builds the frontend and bundles the server entrypoint into `dist`.
+Builds the static frontend into `dist`.
 
 ```bash
 npm run start
 ```
 
-Runs the production build from `dist`.
+Runs a local Vite preview for the static production build.
 
 ```bash
 npm run lint
@@ -72,7 +73,7 @@ Runs TypeScript validation without emitting files.
 
 ## Environment Variables
 
-The project does not require AI provider keys for local development.
+The project does not require AI provider keys or backend secrets.
 
 Optional variable:
 
@@ -84,23 +85,27 @@ APP_URL="http://localhost:3000"
 
 ```text
 src/
-  components/        Editor UI components
+  components/        UI components and screen views
+  lib/               Local storage, validation, ZIP, templates, and catalog loaders
   App.tsx            Main application composition
   main.tsx           React entrypoint
   store.ts           Zustand store
   types.ts           Shared TypeScript types
+public/data/catalog.json
+                     Static catalog used by Cloudflare Pages
+public/data/kb/articles.json
+                     Static knowledge base articles
 public/data/skills.json
-                     Static skill library used by Cloudflare Pages
+                     Static library used by the visual composer
 docs/agent.md        Notes for coding agents
-server.ts            Express API and Vite middleware
+server.ts            Legacy local/server entrypoint; not used by Cloudflare Pages production
 vite.config.ts       Vite configuration
 ```
 
-## Production
+## Cloudflare Pages
 
 ```bash
 npm run build
-npm run start
 ```
 
-The server will run at `http://localhost:3000`.
+Use `dist` as the Pages output directory. The app is static-only in v1; no Express routes, Pages Functions, D1, KV, R2, auth provider, or server-side review workflow are required.

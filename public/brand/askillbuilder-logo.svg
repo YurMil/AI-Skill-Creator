@@ -1,0 +1,67 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">askillbuilder.com AI Skill Hub logo</title>
+  <desc id="desc">A modular AI hub mark with a central AI core connected to six skill modules.</desc>
+  <defs>
+    <linearGradient id="core" x1="178" y1="166" x2="333" y2="342" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4DD8FF"/>
+      <stop offset="0.48" stop-color="#1267A4"/>
+      <stop offset="1" stop-color="#07284D"/>
+    </linearGradient>
+    <linearGradient id="bluePanel" x1="83" y1="94" x2="431" y2="439" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5E99B4"/>
+      <stop offset="1" stop-color="#143D59"/>
+    </linearGradient>
+    <linearGradient id="greenPanel" x1="324" y1="127" x2="453" y2="256" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#65B98B"/>
+      <stop offset="1" stop-color="#1E624D"/>
+    </linearGradient>
+    <linearGradient id="goldPanel" x1="331" y1="288" x2="443" y2="410" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8DDA5"/>
+      <stop offset="1" stop-color="#2F5871"/>
+    </linearGradient>
+    <filter id="shadow" x="24" y="20" width="464" height="472" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="12" stdDeviation="13" flood-color="#08253E" flood-opacity="0.22"/>
+    </filter>
+    <filter id="glow" x="134" y="134" width="244" height="244" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="#F7FAFC"/>
+  <path d="M256 256L157 155M256 256L256 112M256 256L355 155M256 256L355 357M256 256L256 404M256 256L157 357" stroke="#1B5F86" stroke-width="15" stroke-linecap="round"/>
+  <path d="M256 256L157 155M256 256L256 112M256 256L355 155M256 256L355 357M256 256L256 404M256 256L157 357" stroke="#BFEFFF" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+
+  <g filter="url(#shadow)" stroke="#EAF7FA" stroke-width="8" stroke-linejoin="round">
+    <path d="M256 32L326 72V152L256 192L186 152V72L256 32Z" fill="url(#bluePanel)"/>
+    <path d="M111 115L181 155V235L111 275L41 235V155L111 115Z" fill="url(#bluePanel)"/>
+    <path d="M401 115L471 155V235L401 275L331 235V155L401 115Z" fill="url(#greenPanel)"/>
+    <path d="M111 277L181 317V397L111 437L41 397V317L111 277Z" fill="url(#bluePanel)"/>
+    <path d="M401 277L471 317V397L401 437L331 397V317L401 277Z" fill="url(#goldPanel)"/>
+    <path d="M256 320L326 360V440L256 480L186 440V360L256 320Z" fill="url(#bluePanel)"/>
+  </g>
+
+  <g stroke="#DDF3F6" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" opacity="0.95">
+    <path d="M256 91V133M235 102L277 122M277 102L235 122"/>
+    <path d="M97 174V221M125 174V221M88 189H134"/>
+    <path d="M374 180H429V229H374V180Z"/>
+    <path d="M391 213L380 204L391 195M411 195L422 204L411 213"/>
+    <path d="M86 352C86 337 98 326 113 326C128 326 140 337 140 352V381H86V352Z"/>
+    <path d="M94 381H132M94 363H132"/>
+    <path d="M382 340H416L431 356V398H382V340Z"/>
+    <path d="M415 340V357H431M395 372H418M395 389H420"/>
+    <circle cx="246" cy="390" r="32"/>
+    <path d="M270 414L298 442"/>
+  </g>
+
+  <g filter="url(#glow)">
+    <circle cx="256" cy="256" r="75" fill="url(#core)"/>
+    <circle cx="256" cy="256" r="75" stroke="#BFEFFF" stroke-width="5"/>
+    <circle cx="256" cy="256" r="58" stroke="#5AE5FF" stroke-opacity="0.55" stroke-width="2"/>
+  </g>
+  <path d="M199 295L238 211H256L295 295H274L266 276H227L219 295H199ZM235 258H258L247 231L235 258ZM305 295V212H326V295H305Z" fill="#F5FCFF"/>
+  <path d="M199 295L238 211H256L295 295H274L266 276H227L219 295H199ZM235 258H258L247 231L235 258ZM305 295V212H326V295H305Z" stroke="#C9F3FF" stroke-width="1.5"/>
+</svg>
