@@ -46,11 +46,17 @@ export const useAppStore = create<AppState>((set, get) => ({
   setBaseSkills: (skills) => set({ baseSkills: skills }),
   loadSkills: async () => {
     try {
-      const res = await fetch('/api/skills');
+      const res = await fetch('/data/skills.json');
+
+      if (!res.ok) {
+        throw new Error(`Failed to load skills: ${res.status} ${res.statusText}`);
+      }
+
       const data = await res.json();
-      set({ baseSkills: data.skills });
+      set({ baseSkills: data.skills ?? [] });
     } catch (e) {
       console.error("Failed to fetch skills", e);
+      set({ baseSkills: [] });
     }
   },
 
