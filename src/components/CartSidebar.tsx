@@ -80,7 +80,7 @@ export default function CartSidebar() {
           Download .ZIP
         </button>
         <p className="text-[10px] text-gray-400 text-center mt-2 leading-relaxed">
-          Unpack the zip archive into your agent's skills directory. Compatible with Claude, Codex, Gemini, Antigravity.
+          Unpack the zip archive into your agent's skills directory. Compatible with common agent skill formats.
         </p>
       </div>
     </div>

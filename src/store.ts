@@ -3,6 +3,10 @@ import { Node, Edge, addEdge, applyNodeChanges, applyEdgeChanges, Connection, No
 import { Skill, ConfiguredSkill } from './types';
 import { nanoid } from 'nanoid';
 
+type SkillNodeData = Skill & {
+  onAdd?: () => void;
+};
+
 interface AppState {
   // Base Data
   baseSkills: Skill[];
@@ -76,7 +80,15 @@ export const useAppStore = create<AppState>((set, get) => ({
       position,
       data: { 
         ...skill,
-        onAdd: () => get().addToCart({ ...skill, cartId: nanoid(), content: get().nodes.find(n => n.id === newNode.id)?.data.content || skill.content })
+        onAdd: () => {
+          const currentNode = get().nodes.find(n => n.id === newNode.id);
+          const currentContent = (currentNode?.data as Partial<SkillNodeData> | undefined)?.content;
+          get().addToCart({
+            ...skill,
+            cartId: nanoid(),
+            content: currentContent || skill.content,
+          });
+        }
       },
     };
     set({ nodes: [...get().nodes, newNode] });
@@ -134,13 +146,14 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     let combinedContent = `---\nname: ${newSkillName}\ndescription: Auto-combined skill set.\n---\n\n`;
     selected.forEach((node, index) => {
-      combinedContent += `### Included Skill ${index + 1}: ${node.data.name}\n${node.data.content}\n\n`;
+      const skillData = node.data as unknown as SkillNodeData;
+      combinedContent += `### Included Skill ${index + 1}: ${skillData.name}\n${skillData.content}\n\n`;
     });
 
     const newSkill: Skill = {
       id: `custom-${nanoid(5)}`,
       name: newSkillName,
-      description: `Combined skills: ${selected.map(n => n.data.name).join(', ')}`,
+      description: `Combined skills: ${selected.map(n => (n.data as unknown as SkillNodeData).name).join(', ')}`,
       category: "Custom",
       content: combinedContent
     };
