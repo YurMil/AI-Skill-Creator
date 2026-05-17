@@ -74,7 +74,7 @@ export default function CartSidebar() {
         <button
           disabled={cart.length === 0}
           onClick={handleDownloadZip}
-          className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-colors shadow-sm"
+          className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-colors shadow-sm"
         >
           <Download size={16} />
           Download .ZIP

@@ -5,15 +5,19 @@ import {
   BookOpen,
   CheckCircle2,
   Download,
+  Eye,
   FileCode2,
   FilePlus2,
   FolderOpen,
   Import,
   LayoutDashboard,
+  Moon,
   PackageCheck,
   Search,
   ShieldAlert,
+  Sun,
   Upload,
+  X,
 } from 'lucide-react';
 import Canvas from './components/Canvas';
 import CartSidebar from './components/CartSidebar';
@@ -22,6 +26,7 @@ import LibrarySidebar from './components/LibrarySidebar';
 import { loadCatalog, loadKnowledgeArticles } from './lib/catalog';
 import {
   createTextFile,
+  createPackage,
   downloadBlob,
   getSkillFile,
   normalizePath,
@@ -44,6 +49,9 @@ import { validatePackage } from './lib/validation';
 import { CatalogSkill, KnowledgeArticle, LocalSkillStatus, SkillPackage, ValidationIssue } from './types';
 
 type Screen = 'catalog' | 'builder' | 'import' | 'workspace' | 'review' | 'learn' | 'composer';
+type ThemeMode = 'light' | 'dark';
+
+const THEME_STORAGE_KEY = 'ai-skill-creator-theme';
 
 const navItems: Array<{ id: Screen; label: string; icon: typeof LayoutDashboard }> = [
   { id: 'catalog', label: 'Catalog', icon: LayoutDashboard },
@@ -75,6 +83,19 @@ const renderMarkdown = (value: string) =>
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\n/g, '<br />');
 
+const getInitialTheme = (): ThemeMode => {
+  if (typeof window === 'undefined') return 'light';
+
+  try {
+    const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored === 'light' || stored === 'dark') return stored;
+  } catch {
+    return 'light';
+  }
+
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
 const updatePackageMetadataFromSkill = (pkg: SkillPackage): SkillPackage => {
   const skill = getSkillFile(pkg);
   if (!skill?.textContent) return pkg;
@@ -91,8 +112,78 @@ const updatePackageMetadataFromSkill = (pkg: SkillPackage): SkillPackage => {
   };
 };
 
+const catalogSkillContent = (skill: CatalogSkill) => {
+  if (skill.content.trim().startsWith('---')) return skill.content;
+
+  return `---
+name: ${slugifySkillName(skill.name || skill.title)}
+description: ${skill.description}
+---
+
+# Workflow
+
+${skill.content || skill.summary || skill.description}
+`;
+};
+
+const createPackageFromCatalogSkill = (skill: CatalogSkill): SkillPackage => {
+  const name = slugifySkillName(skill.name || skill.title);
+  const content = catalogSkillContent(skill);
+  const metadata = {
+    name,
+    description: skill.description,
+    category: skill.category,
+    tags: skill.tags || [],
+    compatibility: skill.compatibility || ['codex'],
+    license: skill.license || 'MIT',
+    version: skill.version || '0.1.0',
+  };
+  const pkg = createPackage(
+    metadata,
+    [
+      createTextFile('SKILL.md', content),
+      createTextFile(
+        'README.md',
+        `# ${skill.title || skill.name}
+
+${skill.description}
+
+- Category: ${skill.category}
+- Trust level: ${skill.trustLevel || 'seed'}
+- Risk level: ${skill.riskLevel || 'unknown'}
+- Compatibility: ${(skill.compatibility || ['codex']).join(', ')}
+`,
+      ),
+      createTextFile(
+        'metadata.json',
+        JSON.stringify(
+          {
+            ...metadata,
+            title: skill.title,
+            author: skill.author,
+            updatedAt: skill.updatedAt,
+            trustLevel: skill.trustLevel || 'seed',
+            riskLevel: skill.riskLevel || 'unknown',
+          },
+          null,
+          2,
+        ),
+      ),
+    ],
+    'catalog',
+  );
+  const validationReport = validatePackage(pkg);
+
+  return {
+    ...pkg,
+    validationReport,
+    localStatus: validationReport.status === 'passed' || validationReport.status === 'passed_with_warnings' ? 'validated' : 'draft',
+  };
+};
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>('catalog');
+  const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
   const [catalog, setCatalog] = useState<CatalogSkill[]>([]);
   const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
   const [workspace, setWorkspace] = useState<SkillPackage[]>([]);
@@ -100,6 +191,17 @@ export default function App() {
   const [selectedPath, setSelectedPath] = useState('SKILL.md');
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.dataset.theme = theme;
+
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      // Theme persistence is optional; the UI should still update if storage is unavailable.
+    }
+  }, [theme]);
 
   const selectedFile = activePackage.files.find((file) => file.path === selectedPath) || activePackage.files[0];
 
@@ -237,9 +339,26 @@ export default function App() {
     if (pkg.id === activePackage.id) setPackage(next);
   };
 
+  const openCatalogSkill = (skill: CatalogSkill) => {
+    const pkg = createPackageFromCatalogSkill(skill);
+    setPackage(pkg);
+    setSelectedPath('SKILL.md');
+    setScreen('builder');
+    setMessage(`Opened ${skill.title || skill.name} from catalog.`);
+  };
+
+  const downloadCatalogSkill = async (skill: CatalogSkill) => {
+    const pkg = createPackageFromCatalogSkill(skill);
+    const blob = await exportPackageZip(pkg);
+    downloadBlob(blob, `${pkg.rootFolder}-${pkg.metadata.version}.zip`);
+    setMessage(`Downloaded ${skill.title || skill.name}.`);
+  };
+
+  const isDarkTheme = theme === 'dark';
+
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-slate-100 text-slate-900">
-      <aside className="flex w-60 shrink-0 flex-col border-r border-slate-200 bg-white">
+    <div className="app-shell flex h-screen w-full overflow-hidden text-slate-900">
+      <aside className="app-sidebar flex w-60 shrink-0 flex-col border-r border-slate-200 bg-white">
         <div className="border-b border-slate-200 p-4">
           <div className="flex items-center gap-3">
             <img
@@ -261,7 +380,7 @@ export default function App() {
                 key={item.id}
                 onClick={() => setScreen(item.id)}
                 className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition ${
-                  screen === item.id ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  screen === item.id ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-700'
                 }`}
               >
                 <Icon size={16} />
@@ -276,22 +395,40 @@ export default function App() {
       </aside>
 
       <main className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-5">
+        <header className="app-topbar flex h-14 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-5">
           <div>
             <div className="text-sm font-semibold">{navItems.find((item) => item.id === screen)?.label}</div>
             <div className="text-xs text-slate-500">
               {saveState === 'saving' ? 'Autosaving...' : saveState === 'saved' ? 'Workspace saved locally' : saveState === 'error' ? 'Autosave failed' : 'Ready'}
             </div>
           </div>
-          {message && (
-            <button onClick={() => setMessage('')} className="max-w-xl truncate rounded-md border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
-              {message}
+          <div className="flex min-w-0 items-center gap-3">
+            {message && (
+              <button onClick={() => setMessage('')} className="max-w-xl truncate rounded-md border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600">
+                {message}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setTheme(isDarkTheme ? 'light' : 'dark')}
+              className="theme-toggle inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:border-blue-300 hover:text-blue-700"
+              aria-label={isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
+              title={isDarkTheme ? 'Light theme' : 'Dark theme'}
+            >
+              {isDarkTheme ? <Sun size={17} /> : <Moon size={17} />}
             </button>
-          )}
+          </div>
         </header>
 
         {screen === 'catalog' && (
-          <CatalogScreen catalog={catalog} workspace={workspace} onCreate={createFromTemplate} onOpen={openPackage} />
+          <CatalogScreen
+            catalog={catalog}
+            workspace={workspace}
+            onCreate={createFromTemplate}
+            onOpen={openPackage}
+            onOpenSkill={openCatalogSkill}
+            onDownloadSkill={downloadCatalogSkill}
+          />
         )}
         {screen === 'builder' && (
           <BuilderScreen
@@ -345,14 +482,20 @@ function CatalogScreen({
   workspace,
   onCreate,
   onOpen,
+  onOpenSkill,
+  onDownloadSkill,
 }: {
   catalog: CatalogSkill[];
   workspace: SkillPackage[];
   onCreate: (templateId: TemplateId) => void;
   onOpen: (pkg: SkillPackage) => void;
+  onOpenSkill: (skill: CatalogSkill) => void;
+  onDownloadSkill: (skill: CatalogSkill) => void;
 }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('All');
+  const [selectedSkillId, setSelectedSkillId] = useState('');
+  const [isDetailsVisible, setIsDetailsVisible] = useState(false);
   const categories = ['All', ...Array.from(new Set(catalog.map((item) => item.category)))];
   const localApproved = workspace.filter((pkg) => pkg.localStatus === 'approved_local');
   const results = catalog.filter((skill) => {
@@ -361,54 +504,150 @@ function CatalogScreen({
       .toLowerCase();
     return haystack.includes(query.toLowerCase()) && (category === 'All' || skill.category === category);
   });
+  const selectedSkill = results.find((skill) => skill.id === selectedSkillId) || results[0];
+  const showDetails = isDetailsVisible && Boolean(selectedSkill);
+
+  const toggleSkillDetails = (skill: CatalogSkill) => {
+    if (isDetailsVisible && selectedSkillId === skill.id) {
+      setIsDetailsVisible(false);
+      return;
+    }
+
+    setSelectedSkillId(skill.id);
+    setIsDetailsVisible(true);
+  };
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
-      <div className="grid gap-3 md:grid-cols-4">
-        {templates.map((template) => (
-          <button key={template.id} onClick={() => onCreate(template.id)} className="rounded-md border border-slate-200 bg-white p-4 text-left shadow-sm hover:border-slate-400">
-            <FilePlus2 size={18} className="mb-3 text-slate-600" />
-            <div className="text-sm font-semibold">{template.name}</div>
-            <div className="mt-1 text-xs leading-relaxed text-slate-500">{template.description}</div>
-          </button>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3 rounded-md border border-slate-200 bg-white p-3">
-        <Search size={16} className="text-slate-400" />
-        <input value={query} onChange={(event) => setQuery(event.target.value)} className="min-w-64 flex-1 bg-transparent text-sm outline-none" placeholder="Search static catalog by task, tag, compatibility..." />
-        <select value={category} onChange={(event) => setCategory(event.target.value)} className="rounded-md border border-slate-200 bg-white px-2 py-1 text-sm">
-          {categories.map((item) => <option key={item}>{item}</option>)}
-        </select>
-      </div>
-
-      {localApproved.length > 0 && (
-        <div>
-          <h2 className="mb-2 text-sm font-semibold">Local Approved</h2>
-          <div className="grid gap-3 md:grid-cols-3">
-            {localApproved.map((pkg) => <PackageCard key={pkg.id} pkg={pkg} onOpen={() => onOpen(pkg)} />)}
-          </div>
+    <section className={`grid min-h-0 flex-1 overflow-hidden ${showDetails ? 'grid-cols-[minmax(0,1fr)_380px]' : 'grid-cols-1'}`}>
+      <div className="min-h-0 overflow-y-auto p-5">
+        <div className="grid gap-3 md:grid-cols-4">
+          {templates.map((template) => (
+            <button key={template.id} onClick={() => onCreate(template.id)} className="rounded-md border border-slate-200 bg-white p-4 text-left shadow-sm hover:border-slate-400">
+              <FilePlus2 size={18} className="mb-3 text-slate-600" />
+              <div className="text-sm font-semibold">{template.name}</div>
+              <div className="mt-1 text-xs leading-relaxed text-slate-500">{template.description}</div>
+            </button>
+          ))}
         </div>
-      )}
 
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {results.map((skill) => (
-          <article key={skill.id} className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-md border border-slate-200 bg-white p-3">
+          <Search size={16} className="text-slate-400" />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} className="min-w-64 flex-1 bg-transparent text-sm outline-none" placeholder="Search static catalog by task, tag, compatibility..." />
+          <select value={category} onChange={(event) => setCategory(event.target.value)} className="rounded-md border border-slate-200 bg-white px-2 py-1 text-sm">
+            {categories.map((item) => <option key={item}>{item}</option>)}
+          </select>
+        </div>
+
+        {localApproved.length > 0 && (
+          <div className="mt-4">
+            <h2 className="mb-2 text-sm font-semibold">Local Approved</h2>
+            <div className="grid gap-3 md:grid-cols-3">
+              {localApproved.map((pkg) => <PackageCard key={pkg.id} pkg={pkg} onOpen={() => onOpen(pkg)} />)}
+            </div>
+          </div>
+        )}
+
+        <div className={`mt-4 grid gap-3 md:grid-cols-2 ${showDetails ? 'xl:grid-cols-3' : 'xl:grid-cols-4 2xl:grid-cols-5'}`}>
+          {results.map((skill) => {
+            const isSelected = showDetails && selectedSkill?.id === skill.id;
+            return (
+              <article key={skill.id} className={`rounded-md border bg-white p-4 shadow-sm ${isSelected ? 'border-blue-400 ring-2 ring-blue-500/15' : 'border-slate-200'}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-semibold">{skill.title || skill.name}</h3>
+                    <p className="mt-1 text-xs leading-relaxed text-slate-500">{skill.summary || skill.description}</p>
+                  </div>
+                  <span className="rounded bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">{skill.trustLevel || 'seed'}</span>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {[skill.category, ...(skill.tags || []).slice(0, 3), ...(skill.compatibility || []).slice(0, 2)].map((tag) => (
+                    <span key={tag} className="rounded border border-slate-200 px-2 py-0.5 text-xs text-slate-500">{tag}</span>
+                  ))}
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button onClick={() => toggleSkillDetails(skill)} className="flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-xs font-medium hover:bg-blue-50 hover:text-blue-700">
+                    <Eye size={14} /> Details
+                  </button>
+                  <button onClick={() => onOpenSkill(skill)} className="flex items-center gap-1 rounded-md bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-blue-700">
+                    <FileCode2 size={14} /> Open
+                  </button>
+                  <button onClick={() => onDownloadSkill(skill)} className="flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-xs font-medium hover:bg-blue-50 hover:text-blue-700">
+                    <Download size={14} /> ZIP
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+          {results.length === 0 && (
+            <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-500">No catalog skills match this search.</div>
+          )}
+        </div>
+      </div>
+
+      {showDetails && (
+      <aside className="min-h-0 overflow-y-auto border-l border-slate-200 bg-white p-5">
+        {selectedSkill && (
+          <div>
+            <div className="mb-4 flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
+              <div className="text-sm font-semibold">Skill Details</div>
+              <button
+                type="button"
+                onClick={() => setIsDetailsVisible(false)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-blue-50 hover:text-blue-700"
+                aria-label="Hide skill details"
+                title="Hide details"
+              >
+                <X size={16} />
+              </button>
+            </div>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h3 className="text-sm font-semibold">{skill.title || skill.name}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500">{skill.summary || skill.description}</p>
+                <div className="text-xs font-semibold uppercase text-slate-500">{selectedSkill.category}</div>
+                <h2 className="mt-2 text-xl font-semibold">{selectedSkill.title || selectedSkill.name}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-slate-500">{selectedSkill.description}</p>
               </div>
-              <span className="rounded bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">{skill.trustLevel || 'seed'}</span>
+              <span className="rounded bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">{selectedSkill.trustLevel || 'seed'}</span>
             </div>
-            <div className="mt-3 flex flex-wrap gap-1">
-              {[skill.category, ...(skill.tags || []).slice(0, 3), ...(skill.compatibility || []).slice(0, 2)].map((tag) => (
+
+            <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+              <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                <div className="font-semibold text-slate-500">Version</div>
+                <div className="mt-1">{selectedSkill.version || '0.1.0'}</div>
+              </div>
+              <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                <div className="font-semibold text-slate-500">Risk</div>
+                <div className="mt-1">{selectedSkill.riskLevel || 'unknown'}</div>
+              </div>
+              <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                <div className="font-semibold text-slate-500">Author</div>
+                <div className="mt-1">{selectedSkill.author || 'AI Skill Hub'}</div>
+              </div>
+              <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                <div className="font-semibold text-slate-500">Updated</div>
+                <div className="mt-1">{selectedSkill.updatedAt || 'n/a'}</div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-1">
+              {[...(selectedSkill.tags || []), ...(selectedSkill.compatibility || [])].map((tag) => (
                 <span key={tag} className="rounded border border-slate-200 px-2 py-0.5 text-xs text-slate-500">{tag}</span>
               ))}
             </div>
-          </article>
-        ))}
-      </div>
+
+            <div className="mt-5 flex gap-2">
+              <button onClick={() => onOpenSkill(selectedSkill)} className="flex flex-1 items-center justify-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
+                <FileCode2 size={16} /> Open in Builder
+              </button>
+              <button onClick={() => onDownloadSkill(selectedSkill)} className="flex items-center justify-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-blue-50 hover:text-blue-700">
+                <Download size={16} /> ZIP
+              </button>
+            </div>
+
+            <div className="prose-preview mt-5 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: renderMarkdown(catalogSkillContent(selectedSkill)) }} />
+          </div>
+        )}
+      </aside>
+      )}
     </section>
   );
 }
@@ -463,7 +702,7 @@ function BuilderScreen({
           <button disabled={blocking} onClick={onSubmit} className="flex items-center gap-2 rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50">
             <PackageCheck size={16} /> Submit local
           </button>
-          <button onClick={onExport} className="flex items-center gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700">
+          <button onClick={onExport} className="flex items-center gap-2 rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
             <Download size={16} /> Export ZIP
           </button>
         </div>
@@ -479,7 +718,7 @@ function BuilderScreen({
             <button
               key={file.path}
               onClick={() => setSelectedPath(file.path)}
-              className={`flex w-full items-center justify-between rounded px-2 py-2 text-left text-xs ${selectedPath === file.path ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+              className={`flex w-full items-center justify-between rounded px-2 py-2 text-left text-xs ${selectedPath === file.path ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-700'}`}
             >
               <span className="truncate">{file.path}</span>
               <span className="ml-2 shrink-0 opacity-60">{Math.ceil(file.size / 1024)} KB</span>
@@ -567,7 +806,7 @@ function ImportScreen({ onImportZip }: { onImportZip: (file: File) => void }) {
           const file = event.dataTransfer.files[0];
           if (file) onImportZip(file);
         }}
-        className={`flex h-96 w-full max-w-3xl cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed bg-white p-8 text-center ${isDragging ? 'border-slate-900' : 'border-slate-300'}`}
+        className={`flex h-96 w-full max-w-3xl cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed bg-white p-8 text-center ${isDragging ? 'border-blue-500' : 'border-slate-300'}`}
       >
         <Upload size={32} className="text-slate-500" />
         <div className="mt-4 text-lg font-semibold">Upload a skill ZIP</div>
@@ -667,7 +906,7 @@ function LearnScreen({ articles }: { articles: KnowledgeArticle[] }) {
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search articles and error codes..." className="mb-3 w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none" />
         <div className="space-y-2">
           {filtered.map((article) => (
-            <button key={article.id} onClick={() => setSelectedId(article.id)} className={`w-full rounded-md p-3 text-left ${selected?.id === article.id ? 'bg-slate-900 text-white' : 'hover:bg-slate-100'}`}>
+            <button key={article.id} onClick={() => setSelectedId(article.id)} className={`w-full rounded-md p-3 text-left ${selected?.id === article.id ? 'bg-blue-600 text-white shadow-sm' : 'hover:bg-blue-50 hover:text-blue-700'}`}>
               <div className="text-sm font-semibold">{article.title}</div>
               <div className="mt-1 text-xs opacity-70">{article.summary}</div>
             </button>
@@ -704,7 +943,7 @@ function PackageCard({ pkg, onOpen, onDelete }: { key?: string; pkg: SkillPackag
         ))}
       </div>
       <div className="mt-4 flex gap-2">
-        <button onClick={onOpen} className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white">Open</button>
+        <button onClick={onOpen} className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">Open</button>
         {onDelete && <button onClick={onDelete} className="rounded-md border border-red-200 px-3 py-2 text-sm text-red-700">Delete</button>}
       </div>
     </article>

@@ -36,7 +36,7 @@ export default function Canvas() {
     <div className="flex-1 h-full bg-slate-50 relative">
       <div className="absolute top-4 left-6 z-10 select-none pointer-events-none">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Agent Skill Crafter</h1>
-        <p className="text-sm border-l-2 border-indigo-500 pl-2 text-gray-500 mt-1 max-w-sm">
+        <p className="text-sm border-l-2 border-blue-500 pl-2 text-gray-500 mt-1 max-w-sm">
           Drag and drop skills from the library. Connect them visually. Select multiple nodes to combine into complex capability stacks.
         </p>
       </div>
@@ -52,7 +52,7 @@ export default function Canvas() {
         onNodeDoubleClick={onNodeDoubleClick}
         fitView
       >
-        <Background gap={16} size={1} color="#e2e8f0" />
+        <Background gap={16} size={1} color="var(--canvas-grid)" />
         <Controls />
       </ReactFlow>
 
@@ -65,19 +65,19 @@ export default function Canvas() {
               <input 
                 type="text" 
                 placeholder="New Skill Name..." 
-                className="text-sm px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="text-sm px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                 value={combinedName}
                 onChange={e => setCombinedName(e.target.value)}
                 autoFocus
                 onKeyDown={e => e.key === 'Enter' && handleCombine()}
               />
-              <button onClick={handleCombine} className="text-sm font-medium text-indigo-600 hover:text-indigo-700 px-2">Store</button>
+              <button onClick={handleCombine} className="text-sm font-medium text-blue-700 hover:text-blue-800 px-2">Store</button>
               <button onClick={() => setIsCombining(false)} className="text-sm text-gray-500 hover:text-gray-700 px-2">Cancel</button>
             </div>
           ) : (
             <button 
               onClick={() => setIsCombining(true)}
-              className="flex items-center gap-1 text-sm font-medium text-indigo-600 hover:bg-indigo-50 px-3 py-1.5 rounded-full transition-colors"
+              className="flex items-center gap-1 text-sm font-medium text-blue-700 hover:bg-blue-50 px-3 py-1.5 rounded-full transition-colors"
             >
               <Combine size={14} />
               Combine into Stack
