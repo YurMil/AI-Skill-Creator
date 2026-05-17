@@ -22,7 +22,7 @@ export default function LibrarySidebar() {
         <input 
           type="text"
           placeholder="Search skills..."
-          className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+          className="w-full bg-white border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -34,7 +34,7 @@ export default function LibrarySidebar() {
             category: 'Custom',
             content: '---\nname: New Custom Skill\ndescription: A custom skill.\n---\n# Instructions\nWrite your agent instructions here...'
           })}
-          className="w-full py-2 bg-slate-800 text-white rounded font-medium text-sm hover:bg-slate-700 transition"
+          className="w-full py-2 bg-blue-600 text-white rounded font-medium text-sm shadow-sm hover:bg-blue-700 transition"
         >
           Create Blank Skill
         </button>
@@ -48,7 +48,7 @@ export default function LibrarySidebar() {
             </div>
             <button 
               onClick={() => addSkillToCanvas(skill)}
-              className="flex items-center justify-center gap-1 w-full py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded text-xs font-medium transition-colors opacity-0 group-hover:opacity-100"
+              className="flex items-center justify-center gap-1 w-full py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded text-xs font-medium transition-colors opacity-0 group-hover:opacity-100"
             >
               <Plus size={14} />
               Add to Canvas

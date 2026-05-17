@@ -42,7 +42,7 @@ export default function ConfigPanel() {
           <label className="block text-xs font-medium text-gray-700 mb-1">Skill Name</label>
           <input 
             type="text" 
-            className="w-full text-sm p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+            className="w-full text-sm p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none"
             value={tempName}
             onChange={e => setTempName(e.target.value)}
           />
@@ -51,7 +51,7 @@ export default function ConfigPanel() {
         <div>
           <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
           <textarea 
-            className="w-full text-sm p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none resize-none h-20"
+            className="w-full text-sm p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none h-20"
             value={tempDescription}
             onChange={e => setTempDescription(e.target.value)}
           />
@@ -60,7 +60,7 @@ export default function ConfigPanel() {
         <div className="flex-1 flex flex-col">
           <label className="block text-xs font-medium text-gray-700 mb-1">Agent Instructions / MD Content</label>
           <textarea 
-            className="w-full flex-1 min-h-[200px] text-xs font-mono p-3 bg-gray-50 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none resize-none"
+            className="w-full flex-1 min-h-[200px] text-xs font-mono p-3 bg-gray-50 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
             value={tempContent}
             onChange={e => setTempContent(e.target.value)}
           />
@@ -71,7 +71,7 @@ export default function ConfigPanel() {
         <button onClick={() => setEditingNodeId(null)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded transition-colors">
           Cancel
         </button>
-        <button onClick={handleSave} className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded transition-colors shadow-sm">
+        <button onClick={handleSave} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors shadow-sm">
           Save Configuration
         </button>
       </div>

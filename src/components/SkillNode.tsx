@@ -18,16 +18,16 @@ export default function SkillNode({ id, data }: any) {
   };
 
   return (
-    <div className="bg-white border-2 border-indigo-200 rounded-xl shadow-lg w-80 relative flex flex-col overflow-hidden group">
-      <Handle type="target" position={Position.Top} className="w-3 h-3 bg-indigo-500" />
+    <div className="bg-white border-2 border-blue-200 rounded-xl shadow-lg w-80 relative flex flex-col overflow-hidden group">
+      <Handle type="target" position={Position.Top} className="w-3 h-3 bg-blue-500" />
       
-      <div className="bg-indigo-50/50 p-3 border-b border-indigo-100 flex items-center justify-between">
+      <div className="bg-blue-50/50 p-3 border-b border-blue-100 flex items-center justify-between">
         <div>
-          <h3 className="font-semibold text-indigo-900 leading-none">{data.name}</h3>
-          <span className="text-[10px] text-indigo-500 font-medium tracking-wide uppercase">{data.category}</span>
+          <h3 className="font-semibold text-blue-950 leading-none">{data.name}</h3>
+          <span className="text-[10px] text-blue-600 font-medium tracking-wide uppercase">{data.category}</span>
         </div>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={() => setEditingNodeId(id)} className="p-1 hover:bg-indigo-100 rounded text-indigo-600">
+          <button onClick={() => setEditingNodeId(id)} className="p-1 hover:bg-blue-100 rounded text-blue-700">
             <FileEdit size={14} />
           </button>
           <button onClick={() => removeNode(id)} className="p-1 hover:bg-red-100 rounded text-red-500">
@@ -47,7 +47,7 @@ export default function SkillNode({ id, data }: any) {
          </button>
       </div>
 
-      <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-indigo-500" />
+      <Handle type="source" position={Position.Bottom} className="w-3 h-3 bg-blue-500" />
     </div>
   );
 }

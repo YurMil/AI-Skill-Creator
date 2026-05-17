@@ -1,4 +1,41 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+  --app-bg: #f5f7fb;
+  --app-text: #0f172a;
+  --app-muted: #64748b;
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-strong: #ffffff;
+  --surface-muted: rgba(248, 250, 252, 0.86);
+  --surface-elevated: rgba(255, 255, 255, 0.96);
+  --border: rgba(148, 163, 184, 0.32);
+  --border-strong: rgba(71, 85, 105, 0.28);
+  --accent: #2563eb;
+  --accent-soft: rgba(37, 99, 235, 0.1);
+  --canvas-grid: #d8e2ef;
+  --shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.08);
+  --shadow-elevated: 0 18px 44px rgba(15, 23, 42, 0.16);
+}
+
+:root.dark {
+  color-scheme: dark;
+  --app-bg: #020617;
+  --app-text: #e5edf7;
+  --app-muted: #94a3b8;
+  --surface: rgba(15, 23, 42, 0.88);
+  --surface-strong: #0f172a;
+  --surface-muted: rgba(15, 23, 42, 0.72);
+  --surface-elevated: rgba(17, 24, 39, 0.96);
+  --border: rgba(148, 163, 184, 0.2);
+  --border-strong: rgba(148, 163, 184, 0.3);
+  --accent: #60a5fa;
+  --accent-soft: rgba(96, 165, 250, 0.14);
+  --canvas-grid: rgba(96, 165, 250, 0.14);
+  --shadow-soft: 0 14px 36px rgba(0, 0, 0, 0.35);
+  --shadow-elevated: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
 
 html,
 body,
@@ -8,6 +45,306 @@ body,
 
 body {
   margin: 0;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.2);
+}
+
+.app-shell {
+  background:
+    radial-gradient(circle at 15% -12%, rgba(59, 130, 246, 0.16), transparent 28rem),
+    radial-gradient(circle at 78% -18%, rgba(20, 184, 166, 0.12), transparent 24rem),
+    linear-gradient(180deg, #f8fbff 0%, var(--app-bg) 42%, #eef3f9 100%);
+  color: var(--app-text);
+}
+
+.dark .app-shell {
+  background:
+    radial-gradient(circle at 16% -12%, rgba(37, 99, 235, 0.22), transparent 30rem),
+    radial-gradient(circle at 82% -18%, rgba(20, 184, 166, 0.12), transparent 26rem),
+    linear-gradient(180deg, #030712 0%, #020617 55%, #07111f 100%);
+}
+
+.app-sidebar,
+.app-topbar {
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+.app-shell .bg-white {
+  background-color: var(--surface);
+}
+
+.app-shell .bg-slate-50,
+.app-shell .bg-gray-50 {
+  background-color: var(--surface-muted);
+}
+
+.app-shell .bg-slate-100,
+.app-shell .bg-gray-100 {
+  background-color: rgba(226, 232, 240, 0.72);
+}
+
+.app-shell .bg-slate-950 {
+  background-color: #020617;
+}
+
+.app-shell textarea.bg-slate-950 {
+  color: #f8fafc;
+}
+
+.app-shell .bg-slate-950 .text-slate-300 {
+  color: #cbd5e1;
+}
+
+.dark .app-shell [class~="bg-slate-50/50"],
+.dark .app-shell [class~="bg-white/50"] {
+  background-color: rgba(15, 23, 42, 0.72);
+}
+
+.dark .app-shell [class~="bg-indigo-50/50"],
+.dark .app-shell [class~="bg-blue-50/50"],
+.dark .app-shell .bg-indigo-50,
+.dark .app-shell .bg-blue-50 {
+  background-color: rgba(37, 99, 235, 0.14);
+}
+
+.dark .app-shell .bg-indigo-100,
+.dark .app-shell .bg-blue-100 {
+  background-color: rgba(37, 99, 235, 0.22);
+}
+
+.dark .app-shell .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.14);
+}
+
+.dark .app-shell .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.14);
+}
+
+.app-shell .border-slate-200,
+.app-shell .border-slate-300,
+.app-shell .border-gray-100,
+.app-shell .border-gray-200,
+.app-shell .border-gray-300,
+.app-shell .border-indigo-100,
+.app-shell .border-indigo-200,
+.app-shell .border-blue-100,
+.app-shell .border-blue-200 {
+  border-color: var(--border);
+}
+
+.app-shell .border-slate-400,
+.app-shell .border-slate-700,
+.app-shell .border-slate-800 {
+  border-color: var(--border-strong);
+}
+
+.app-shell .text-slate-950,
+.app-shell .text-slate-900,
+.app-shell .text-slate-800,
+.app-shell .text-slate-700,
+.app-shell .text-gray-900,
+.app-shell .text-gray-800,
+.app-shell .text-gray-700,
+.app-shell .text-indigo-900,
+.app-shell .text-blue-950 {
+  color: var(--app-text);
+}
+
+.app-shell .text-slate-600,
+.app-shell .text-slate-500,
+.app-shell .text-slate-400,
+.app-shell .text-gray-600,
+.app-shell .text-gray-500,
+.app-shell .text-gray-400,
+.app-shell .text-gray-300 {
+  color: var(--app-muted);
+}
+
+.dark .app-shell .text-indigo-600,
+.dark .app-shell .text-indigo-500,
+.dark .app-shell .text-blue-700,
+.dark .app-shell .text-blue-600 {
+  color: #93c5fd;
+}
+
+.dark .app-shell .text-emerald-700,
+.dark .app-shell .text-emerald-600 {
+  color: #5eead4;
+}
+
+.dark .app-shell .text-red-700,
+.dark .app-shell .text-red-500 {
+  color: #fca5a5;
+}
+
+.dark .app-shell .text-amber-700 {
+  color: #fcd34d;
+}
+
+.app-shell .shadow-sm,
+.app-shell .shadow-lg,
+.app-shell [class*="shadow-["] {
+  box-shadow: var(--shadow-soft);
+}
+
+.app-shell .shadow-2xl {
+  box-shadow: var(--shadow-elevated);
+}
+
+.app-shell article.bg-white,
+.app-shell button.bg-white,
+.app-shell label.bg-white,
+.app-shell .group.bg-white {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.app-shell article.bg-white:hover,
+.app-shell button.bg-white:hover,
+.app-shell label.bg-white:hover,
+.app-shell .group.bg-white:hover {
+  border-color: color-mix(in srgb, var(--accent), var(--border) 42%);
+  box-shadow: var(--shadow-soft);
+}
+
+.app-shell .rounded,
+.app-shell .rounded-md,
+.app-shell .rounded-lg,
+.app-shell .rounded-xl {
+  border-radius: 0.5rem;
+}
+
+.app-shell .tracking-tight,
+.app-shell .tracking-wide,
+.app-shell .tracking-wider {
+  letter-spacing: 0;
+}
+
+.app-shell input,
+.app-shell select,
+.app-shell textarea {
+  color: var(--app-text);
+}
+
+.app-shell input::placeholder,
+.app-shell textarea::placeholder {
+  color: color-mix(in srgb, var(--app-muted), transparent 18%);
+}
+
+.dark .app-shell input:not([class*="bg-transparent"]),
+.dark .app-shell select,
+.dark .app-shell textarea:not([class*="bg-slate-950"]) {
+  background-color: rgba(15, 23, 42, 0.88);
+  border-color: var(--border);
+}
+
+.dark .app-shell option {
+  background: #0f172a;
+  color: var(--app-text);
+}
+
+.dark .app-shell .hover\:bg-slate-100:hover,
+.dark .app-shell .hover\:bg-slate-50:hover,
+.dark .app-shell .hover\:bg-gray-200:hover {
+  background-color: rgba(51, 65, 85, 0.76);
+}
+
+.dark .app-shell .hover\:bg-blue-50:hover,
+.dark .app-shell .hover\:bg-blue-100:hover,
+.dark .app-shell .hover\:bg-indigo-50:hover,
+.dark .app-shell .hover\:bg-indigo-100:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+}
+
+.dark .app-shell .hover\:text-slate-900:hover,
+.dark .app-shell .hover\:text-gray-700:hover,
+.dark .app-shell .hover\:text-blue-700:hover,
+.dark .app-shell .hover\:text-blue-800:hover {
+  color: #dbeafe;
+}
+
+.dark .app-shell .disabled\:bg-gray-300:disabled {
+  background-color: rgba(71, 85, 105, 0.72);
+}
+
+.theme-toggle {
+  flex: 0 0 auto;
+}
+
+.app-shell * {
+  scrollbar-color: color-mix(in srgb, var(--app-muted), transparent 45%) transparent;
+}
+
+.app-shell *::-webkit-scrollbar {
+  height: 0.75rem;
+  width: 0.75rem;
+}
+
+.app-shell *::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--app-muted), transparent 55%);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+
+.react-flow {
+  background: transparent;
+}
+
+.react-flow__controls {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.react-flow__controls-button {
+  background: var(--surface-elevated);
+  border-bottom-color: var(--border);
+  color: var(--app-text);
+}
+
+.react-flow__controls-button:hover {
+  background: var(--accent-soft);
+}
+
+.react-flow__attribution {
+  background: var(--surface-muted);
+  color: var(--app-muted);
+}
+
+.react-flow__handle {
+  border: 2px solid var(--surface-elevated);
+}
+
+.react-flow__edge-path {
+  stroke: color-mix(in srgb, var(--accent), #64748b 28%);
+  stroke-width: 2;
 }
 
 .prose-preview h1 {
@@ -30,7 +367,7 @@ body {
 
 .prose-preview code {
   border-radius: 0.25rem;
-  background: #e2e8f0;
+  background: color-mix(in srgb, var(--app-muted), transparent 80%);
   padding: 0.05rem 0.25rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   font-size: 0.85em;
