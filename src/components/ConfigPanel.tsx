@@ -1,12 +1,13 @@
 import { useAppStore } from '../store';
 import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import type { Skill } from '../types';
 
 export default function ConfigPanel() {
   const { editingNodeId, setEditingNodeId, nodes, updateNodeContent, updateNodeDetails } = useAppStore();
   
   const editingNode = nodes.find(n => n.id === editingNodeId);
-  const data = editingNode?.data;
+  const data = editingNode?.data as Partial<Skill> | undefined;
 
   const [tempName, setTempName] = useState('');
   const [tempDescription, setTempDescription] = useState('');
